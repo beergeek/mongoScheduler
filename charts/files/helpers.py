@@ -59,3 +59,42 @@ def checkCpuString(quantity):
     return decimal.Decimal(qtyArray[0][0]) / 1000
   else:
     return decimal.Decimal(qtyArray[0][0])
+
+# /
+  # Desccription: Makes a list only have unique members
+  #
+  # Inputs:
+  #   un_unique_list: List to make unique
+# /
+def unique(un_unique_list):
+  # initialize a null list
+  unique_list = []
+   
+  # traverse for all elements
+  for x in un_unique_list:
+      # check if exists in unique_list or not
+      if x not in unique_list:
+          unique_list.append(x)
+
+  return unique_list
+
+# /
+  # Desccription: Removes all multiple instances
+  #
+  # Inputs:
+  #   pvpvcList: List of pvc and pv objects
+# /
+def cleanMultiples(pvpvcList):
+  pvFound = []
+  finalMap = []
+  for data in pvpvcList:
+    for pv in data['pv']:
+      if pv in pvFound:
+        continue
+      else:
+        pvFound.append(pv)
+        finalMap.append({"pvc": data['pvc'], "pv": pv})
+        break
+  for i in finalMap:
+    logging.info("PVC %s, PV: %s" % (i['pvc'].metadata.name, i['pv'].metadata.name))
+  return finalMap

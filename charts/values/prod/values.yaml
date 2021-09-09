@@ -6,7 +6,7 @@ imageDetails:
   pullPolicy: Always
 config:
   namespace: mongodb
-  logLevel: DEBUG
+  logLevel: INFO
   primaryDataCentres:
     - DCA
     - DCB
