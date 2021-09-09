@@ -20,6 +20,8 @@ spec:
       - name: {{ .Release.Name }}
         image: {{ .Values.imageDetails.name }}:{{ .Values.imageDetails.version }}
         imagePullPolicy: {{ .Values.imageDetails.pullPolicy }}
+        command: ["/bin/sh"]
+        args: ['-c', 'python3 /init/mongoScheduler.py']
         volumeMounts:
         - name: conf
           mountPath: /init
