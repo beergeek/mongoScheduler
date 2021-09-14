@@ -23,4 +23,4 @@ This custom Kubernetes Scheduler predictively schedules pods onto worker nodes i
 
 * No `preferred` affinity or antiaffinity as yet
 * No `Gt` or `Lt` for affinity or antoaffinity as yet
-* * No dynamic provisioning of PVs as yet
+* No dynamic provisioning of PVs as yet
