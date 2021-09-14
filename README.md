@@ -16,11 +16,15 @@ Currently there is not way for a Kubernetes statefulSet to set one pod to be in 
 
 This custom Kubernetes Scheduler predictively schedules pods onto worker nodes in certains data centres by splitting the number of members of the replica set/shard minus on pod and then using the modulus of the available data centres where electable-members can be placed. The scheduler always places the last pod (non-electable) onto designated worker nodes in a selected data centre where non-electable pods should reside. Antiaffinity and affinity are respected (within limitations) for both pod and node.
 
+This scheduler only works for statefulSets.
+
 ## Setup
 
 ### Scheduler
 
-This repo includes Helm charts to install the custom scheduler. I recommend using Helfile to install the required resources all at once. By modifying the `value.yaml` file under your selected environment, e.g. `charts/values/production/values.yaml` for the `production` envioronment, you can manage different schedulers for different environments by just changing the name of the environment directory (`charts/values/<ENVIORNMENT>`). The value for `<ENVIRONMENT>` can be any name that Kubernetes can use.
+This repo includes Helm charts to install the custom scheduler. I recommend using Helfmile to install the required resources all at once. By modifying the `value.yaml` file under your selected environment, e.g. `charts/values/production/values.yaml` for the `production` envioronment, you can manage different schedulers for different environments by just changing the name of the environment directory (`charts/values/<ENV>`). The value for `<ENV>` can be any name that Kubernetes can use.
+
+[Helm](https://helm.sh/docs/intro/install/) is required to be installed and [Helmfile](https://github.com/roboll/helmfile) is also highly recommended. If Helmfile is used you will also need [Helm-Diff](https://github.com/databus23/helm-diff).
 
 Available attributes in the `values.yaml` file:
 |Key|Description|
@@ -34,7 +38,27 @@ Available attributes in the `values.yaml` file:
 |config.primaryDataCentres|An array of data centres where electable members can reside. These will be the values of the select label to identify the worker names (`config.dataCentresLabel`).|
 |config.noPrimaryDataCentres|An array of data centres where non-electable memebrs will reside. These will be the values of the select label to identify the worker names (`config.dataCentresLabel`).|
 
+The name of the pod deployed by default is `mongo-scheduler-<ENV>-<RANDOM>`. Where the `<ENV>` is the value specified above for the environment and will be used as an environment variable when deploying via Helmfile.
+
+To deploy the schduler with Helmfile use the following:
+
+```shell
+ENV=<ENV> NS=<NAMESPACE> KUBECONFIG=$PWD/<KUBECONFIG_FILE> helmfile apply
+```
+
+Where `<ENV>` is specified as above, `<NAMESPACE>` is the Kuberntes environment to deploy into and manage scheduling (if configured in statefulSets), and the `<KUBECONFIG_FILE>` is the config file to gain access to the Kubernetes cluster.
+
+To remove the scheduler for a namespace and environment via Helmfile use:
+
+```shell
+ENV=<ENV> NS=<NAMESPACE> KUBECONFIG=$PWD/<KUBECONFIG_FILE> helmfile destroy
+```
+
 ### statefulSets
+
+To use this with the MongoDB Kubernetes Operator the `scheduler` attribute must be set for the deployment resource:
+
+
 
 ## Limitations
 
