@@ -38,7 +38,7 @@ Available attributes in the `values.yaml` file:
 |config.primaryDataCentres|An array of data centres where electable members can reside. These will be the values of the select label to identify the worker names (`config.dataCentresLabel`).|
 |config.noPrimaryDataCentres|An array of data centres where non-electable memebrs will reside. These will be the values of the select label to identify the worker names (`config.dataCentresLabel`).|
 
-The name of the pod deployed by default is `mongo-scheduler-<ENV>-<RANDOM>`. Where the `<ENV>` is the value specified above for the environment and will be used as an environment variable when deploying via Helmfile.
+The name of the schduler deployed by default is `mongo-scheduler-<ENV>`, the actual pod will have a random string at the end of the name. The `<ENV>` is the value specified above for the environment and will be used as an environment variable when deploying via Helmfile.
 
 To deploy the schduler with Helmfile use the following:
 
@@ -56,9 +56,47 @@ ENV=<ENV> NS=<NAMESPACE> KUBECONFIG=$PWD/<KUBECONFIG_FILE> helmfile destroy
 
 ### statefulSets
 
-To use this with the MongoDB Kubernetes Operator the `scheduler` attribute must be set for the deployment resource:
+To use this with the MongoDB Kubernetes Operator the `schedulerName` attribute must be set for the deployment resource:
 
+```shell
+---
+apiVersion: mongodb.com/v1
+kind: MongoDB
+metadata:
+  name: my-replica-set
+spec:
+  members: 3
+  version: 4.4.8-ent
+  service: my-service
 
+  opsManager:
+    configMapRef:
+      name: my-project
+  credentials: my-credentials
+  type: ReplicaSet
+
+  persistent: true
+  podSpec:
+    podTemplate:
+      spec:
+        schedulerName: mongo-scheduler-prod
+        containers:
+          - name: mongodb-enterprise-database
+            resources:
+              limits:
+                memory: 512M
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchExpressions:
+                    - key: "app"
+                      operator: In
+                      values:
+                      - my-replica-set-svc
+```
+
+The key of interest is `spec.podSpec.podTemplate.spec.schedulerName` and is the name of the scheduler deployed as described above.
 
 ## Limitations
 
