@@ -20,6 +20,20 @@ This custom Kubernetes Scheduler predictively schedules pods onto worker nodes i
 
 ### Scheduler
 
+This repo includes Helm charts to install the custom scheduler. I recommend using Helfile to install the required resources all at once. By modifying the `value.yaml` file under your selected environment, e.g. `charts/values/production/values.yaml` for the `production` envioronment, you can manage different schedulers for different environments by just changing the name of the environment directory (`charts/values/<ENVIORNMENT>`). The value for `<ENVIRONMENT>` can be any name that Kubernetes can use.
+
+Available attributes in the `values.yaml` file:
+|Key|Description|
+|----------|------------------------------------|
+|imageDetail.name|Address of the Docker image to use for the scheduler. The provided image is `ghcr.io/beergeek/mongoscheduler`.|
+|imageDetail.version|Version of the Docker image to use.|
+|imageDetail.pullPolicy|The pull policy for the Docker image. Can be `IfNotPresent`, `Always`, or `Never`.|
+|config.namespace|The Kubernetes namespace where the scheduler will be deployed and operate.|
+|config.logLevel|The log level for the schduler logs. Can eb `DEBUG` or `INFO`.|
+|config.dataCentresLabel|The Kubernetes worker node label used to identify which data centre a worker node belongs to|
+|config.primaryDataCentres|An array of data centres where electable members can reside. These will be the values of the select label to identify the worker names (`config.dataCentresLabel`).|
+|config.noPrimaryDataCentres|An array of data centres where non-electable memebrs will reside. These will be the values of the select label to identify the worker names (`config.dataCentresLabel`).|
+
 ### statefulSets
 
 ## Limitations
